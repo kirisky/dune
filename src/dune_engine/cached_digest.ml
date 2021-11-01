@@ -332,7 +332,7 @@ let remove path =
   Path.Table.remove cache.table path
 
 module Untracked = struct
-  let source_or_external_file = peek_or_refresh_file ~allow_dirs:false
+  let source_or_external_path = peek_or_refresh_file ~allow_dirs:true
 
   let invalidate_cached_timestamp path =
     let cache = Lazy.force cache in

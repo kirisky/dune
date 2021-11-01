@@ -286,7 +286,7 @@ let source_or_external_file_digest path =
       ([ Pp.textf "File unavailable: %s" (Path.to_string_maybe_quoted path) ]
       @ details)
   in
-  Fs_memo.file_digest path >>= function
+  Fs_memo.path_digest path >>= function
   | Ok digest -> Memo.return digest
   | No_such_file -> report_user_error []
   | Broken_symlink -> report_user_error [ Pp.text "Broken symbolic link" ]

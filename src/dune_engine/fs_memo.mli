@@ -29,7 +29,7 @@ val path_kind : Path.t -> (File_kind.t, Unix_error.Detailed.t) result Memo.t
     change to the file and therefore knows that the cached digest is stale and
     is about to be invalidated by an incoming file-system event. By not using
     the cache in this situation, it's possible to avoid unnecessary restarts. *)
-val file_digest :
+val path_digest :
   ?force_update:bool -> Path.t -> Cached_digest.Digest_result.t Memo.t
 
 (** Like [Io.Untracked.with_lexbuf_from_file] but declares a dependency on the

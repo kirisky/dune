@@ -97,11 +97,11 @@ let delete_stale_dot_merlin_file ~dir ~source_files_to_ignore =
 let promote_target_if_not_up_to_date ~src ~src_digest ~dst ~promote_source
     ~promote_until_clean =
   let open Fiber.O in
-  (* It is OK to use [Fs_cache.Untracked.file_digest] here because below we use
-     the tracked [Fs_memo.file_digest] to subscribe to the promotion result. *)
+  (* It is OK to use [Fs_cache.Untracked.path_digest] here because below we use
+     the tracked [Fs_memo.path_digest] to subscribe to the promotion result. *)
   let* promoted =
     match
-      Fs_cache.read Fs_cache.Untracked.file_digest (Path.source dst)
+      Fs_cache.read Fs_cache.Untracked.path_digest (Path.source dst)
       |> Cached_digest.Digest_result.to_option
     with
     | Some dst_digest when Digest.equal src_digest dst_digest ->
@@ -128,7 +128,7 @@ let promote_target_if_not_up_to_date ~src ~src_digest ~dst ~promote_source
       true
   in
   let+ dst_digest_result =
-    Memo.run (Fs_memo.file_digest ~force_update:promoted (Path.source dst))
+    Memo.run (Fs_memo.path_digest ~force_update:promoted (Path.source dst))
   in
   match Cached_digest.Digest_result.to_option dst_digest_result with
   | Some dst_digest ->

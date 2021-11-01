@@ -148,7 +148,7 @@ end = struct
     in
     Update_all.reduce
       [ update Fs_cache.Untracked.path_stat
-      ; update Fs_cache.Untracked.file_digest
+      ; update Fs_cache.Untracked.path_digest
       ; update Fs_cache.Untracked.dir_contents
       ]
 
@@ -268,12 +268,12 @@ let dir_exists path =
    instead. For now, we keep it here because it seems nice to group all tracked
    file system access functions in one place, and exposing an uncached version
    of [file_digest] seems error-prone. We may need to rethink this decision. *)
-let file_digest ?(force_update = false) path =
+let path_digest ?(force_update = false) path =
   if force_update then (
     Cached_digest.Untracked.invalidate_cached_timestamp path;
-    Fs_cache.evict Fs_cache.Untracked.file_digest path);
+    Fs_cache.evict Fs_cache.Untracked.path_digest path);
   let+ () = Watcher.watch ~try_to_watch_via_parent:true path in
-  Fs_cache.read Fs_cache.Untracked.file_digest path
+  Fs_cache.read Fs_cache.Untracked.path_digest path
 
 let dir_contents ?(force_update = false) path =
   if force_update then Fs_cache.evict Fs_cache.Untracked.dir_contents path;
@@ -286,11 +286,11 @@ let dir_contents ?(force_update = false) path =
    function with two simpler ones that can be cached independently. *)
 let tracking_file_digest path =
   let+ () = Watcher.watch ~try_to_watch_via_parent:true path in
-  (* This is a bit of a hack. By reading [file_digest], we cause the [path] to
-     be recorded in the [Fs_cache.Untracked.file_digest], so the build will be
+  (* This is a bit of a hack. By reading [path_digest], we cause the [path] to
+     be recorded in the [Fs_cache.Untracked.path_digest], so the build will be
      restarted if the digest changes. *)
   let (_ : Cached_digest.Digest_result.t) =
-    Fs_cache.read Fs_cache.Untracked.file_digest path
+    Fs_cache.read Fs_cache.Untracked.path_digest path
   in
   ()
 

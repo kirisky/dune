@@ -36,12 +36,12 @@ val refresh :
   -> Digest_result.t
 
 module Untracked : sig
-  (** Digest the contents of a source or external file. This function doesn't
+  (** Digest the contents of a source or external path. This function doesn't
       track the source file. For a tracked version, see [fs_memo.mli]. *)
-  val source_or_external_file : Path.t -> Digest_result.t
+  val source_or_external_path : Path.t -> Digest_result.t
 
   (** Invalidate the cached [stat] value. This causes the subsequent call to
-      [source_or_external_file] to incur an additional [stat] call. *)
+      [source_or_external_path] to incur an additional [stat] call. *)
   val invalidate_cached_timestamp : Path.t -> unit
 end
 
@@ -54,7 +54,7 @@ val set : Path.Build.t -> Digest.t -> unit
 val remove : Path.Build.t -> unit
 
 (** Invalidate all cached [stat] values. This causes all subsequent calls to
-    [build_file] or [source_or_external_file] to incur additional [stat] calls. *)
+    [build_file] or [source_or_external_path] to incur additional [stat] calls. *)
 val invalidate_cached_timestamps : unit -> unit
 
 (** The reduced set of file stats this module inspects to decide whether a file
