@@ -746,7 +746,7 @@ end = struct
   let execute_action_generic_stage2_memo =
     Memo.create "execute-action"
       ~input:(module Anonymous_action)
-      execute_action_generic_stage2_impl
+      ~cutoff:Path.Build.equal execute_action_generic_stage2_impl
 
   let execute_action_generic ~observing_facts (act : Rule.Anonymous_action.t)
       ~capture_stdout =
