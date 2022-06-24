@@ -189,7 +189,6 @@ end
 
 type t =
   { context : Context.t
-  ; host : t option
   ; env_tree : Env_tree.t
   }
 
@@ -204,8 +203,6 @@ let hash t = Context.hash t.context
 let to_dyn_concise t = Context.to_dyn_concise t.context
 
 let to_dyn t = Context.to_dyn t.context
-
-let host t = Option.value t.host ~default:t
 
 let expander t ~dir = Env_tree.expander t.env_tree ~dir
 
@@ -512,7 +509,7 @@ let create ~(context : Context.t) ~host ~packages ~stanzas =
       ~host_env_tree:(Option.map host ~f:(fun x -> x.env_tree))
       ~root_expander ~bin_artifacts:artifacts.bin ~context_env
   in
-  { context; host; env_tree }
+  { context; env_tree }
 
 let all =
   Memo.lazy_ (fun () ->

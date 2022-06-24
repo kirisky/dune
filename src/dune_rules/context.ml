@@ -887,6 +887,8 @@ let map_exe (context : t) =
         Path.append_source (Path.build host.build_dir) exe
       | _ -> exe)
 
+let host t = Option.value ~default:t t.for_host
+
 let roots t =
   let module Roots = Install.Section.Paths.Roots in
   let prefix_roots =

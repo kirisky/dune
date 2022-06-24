@@ -195,7 +195,7 @@ end = struct
       let dll_files = dll_files ~modes ~dynlink:lib.dynlink ~ctx info in
       (lib_files, dll_files)
     in
-    let+ execs = lib_ppxs sctx ~scope ~lib in
+    let+ execs = lib_ppxs ctx ~scope ~lib in
     let install_c_headers =
       List.map lib.install_c_headers ~f:(fun base ->
           Path.Build.relative dir (base ^ Foreign_language.header_extension))

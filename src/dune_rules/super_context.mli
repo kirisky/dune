@@ -19,8 +19,6 @@ val context : t -> Context.t
 (** Context env with additional variables computed from packages *)
 val context_env : t -> Env.t
 
-val host : t -> t
-
 (** Compute the ocaml flags based on the directory environment and a buildable
     stanza *)
 val ocaml_flags :

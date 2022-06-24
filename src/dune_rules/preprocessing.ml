@@ -276,8 +276,8 @@ module Driver = struct
                          Lib_name.to_string (Lib.name (lib t)))))))
 end
 
-let ppx_exe sctx ~key =
-  let build_dir = (Super_context.context sctx).build_dir in
+let ppx_exe (ctx : Context.t) ~key =
+  let build_dir = ctx.build_dir in
   Path.Build.relative build_dir (".ppx/" ^ key ^ "/ppx.exe")
 
 let build_ppx_driver sctx ~scope ~target ~pps ~pp_names =
@@ -339,7 +339,8 @@ let build_ppx_driver sctx ~scope ~target ~pps ~pp_names =
   ()
 
 let get_rules sctx key =
-  let exe = ppx_exe sctx ~key in
+  let ctx = Super_context.context sctx in
+  let exe = ppx_exe ctx ~key in
   let* pp_names, scope =
     match Digest.from_hex key with
     | None ->
@@ -352,9 +353,8 @@ let get_rules sctx key =
       let+ scope =
         let dir =
           match project_root with
-          | None -> (Super_context.context sctx).build_dir
-          | Some dir ->
-            Path.Build.append_source (Super_context.context sctx).build_dir dir
+          | None -> ctx.build_dir
+          | Some dir -> Path.Build.append_source ctx.build_dir dir
         in
         Scope.DB.find_by_dir dir
       in
@@ -372,12 +372,11 @@ let gen_rules sctx components =
   | [ key ] -> get_rules sctx key
   | _ -> Memo.return ()
 
-let ppx_driver_exe sctx libs =
+let ppx_driver_exe (ctx : Context.t) libs =
   let key = Digest.to_string (Key.Decoded.of_libs libs |> Key.encode) in
   (* Make sure to compile ppx.exe for the compiling host. See: #2252, #2286 and
      #3698 *)
-  let sctx = SC.host sctx in
-  ppx_exe sctx ~key
+  ppx_exe ~key (Context.host ctx)
 
 let get_cookies ~loc ~expander ~lib_name libs =
   let open Memo.O in
@@ -442,8 +441,11 @@ let ppx_driver_and_flags_internal sctx ~dune_version ~loc ~expander ~lib_name
   let+ cookies =
     Action_builder.of_memo (get_cookies ~loc ~lib_name ~expander libs)
   in
-  let sctx = SC.host sctx in
-  (ppx_driver_exe sctx libs, flags @ cookies)
+  let ppx_driver_exe =
+    let ctx = Context.host (Super_context.context sctx) in
+    ppx_driver_exe ctx libs
+  in
+  (ppx_driver_exe, flags @ cookies)
 
 let ppx_driver_and_flags sctx ~lib_name ~expander ~scope ~loc ~flags pps =
   let open Action_builder.O in
